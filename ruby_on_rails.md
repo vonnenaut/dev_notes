@@ -2,6 +2,24 @@
 
 
 
+## Creating a Rails App
+
+`rails new app_name` --api		
+
+
+
+
+
+**How to Manually Change from Default DB**
+
+
+
+
+
+
+
+
+
 ## Installation Notes
 
 https://gorails.com/setup/ubuntu/18.04
