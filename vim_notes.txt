@@ -1,0 +1,16 @@
+------------------
+VIM shortcuts
+=====================
+
+<shift> + g      go to end of file
+gg               go to beginning of file
+:                switch mode
+<esc>            exit mode
+:i               switch to edit mode
+:wq              write and quit
+:q!              quit without saving
+:?               search for text in the file
+dd               delete a line
+x                delete a char
+
+

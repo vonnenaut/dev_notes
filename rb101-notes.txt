@@ -1,0 +1,1231 @@
+____________  __  _____  __  
+| ___ \ ___ \/  ||  _  |/  | 
+| |_/ / |_/ /`| || |/' |`| | 
+|    /| ___ \ | ||  /| | | | 
+| |\ \| |_/ /_| |\ |_/ /_| |_
+\_| \_\____/ \___/\___/ \___/
+                             
+Notes
+
+--------
+Documentation
+=============
+ruby-doc.org/core-2.5.1
+ctrl-f 'search term'
+* if you can't find a method in a particular place, also look at parent (Object, etc.) and Included Modules (Enumerable, etc.) methods
+  * Also check std-lib API section, and check notes for other libraries in each place searched
+
+------
+Truthiness
+----------
+* everything in Ruby is an object and anything that isn't explicitly false or nil evaluates to true
+* && and || are short-circuited if they're certain --  the rest isn't evaluated, i.e., with true || .. Ruby doesn't even look at .. because true || anything is true
+  
+
+--------
+Pseudocode
+----------
+keyword	              meaning
+START	                start of the program
+SET	                  sets a variable we can use for later
+GET	                  retrieve input from user
+PRINT	                displays output to user
+READ	                retrieve value from variable
+IF / ELSE IF / ELSE	  show conditional branches in logic
+WHILE                 show looping logic
+END	                  end of the program
+
+
+  START
+
+  # Given a collection of integers called "numbers"
+
+  SET iterator = 1
+  SET saved_number = value within numbers collection at space 1
+
+  WHILE iterator <= length of numbers
+    SET current_number = value within numbers collection at space "iterator"
+    IF saved_number >= current_number
+      go to the next iteration
+    ELSE
+      saved_number = current_number
+
+    iterator = iterator + 1
+
+  PRINT saved_number
+
+  END
+
+
+--------
+Debugging
+-----------
+Steps
+1. Reproduce error
+2. Determine boundaries of error
+    make minor changes to see when error disappears or changes to find its edges
+3. Trace the code
+    make a flowchart if it helps and/or annotate or mark the code (try printing it out on paper and writing hand notes), whatever is needed until you understand it
+4. Understand the problem well
+    understand the big-picture flow but also each method, what it does and how
+5. Implement a fix
+    there are often multiple ways and multiple layers to make a fix; fix one problem at a time
+6. Test the fix
+
+
+------------------
+Techniques for Debugging
+-----------------------
+* Your best debugigng tool is your patience -- develop the right temperament
+1. Line by line
+    
+    develop a habit of reading your code line-by-line, word-by-word, character-by-character -- pay close attention to details
+
+2. Rubber Duck
+
+    Use an object, such as a rubber duck, as a sounding board when faced with a hard problem.  Explain the problem in words.  This forced articulation in detail often leads to finding the root of the problem. 
+
+3.  Walking Away
+
+    Go for a walk, a swim, a run, a hike, a nap, a shower, etc.  This is diffuse learning in action and can lead to eureka moments.  
+
+4.  Using Pry
+
+   Pry is a powerful Ruby REPL that can replace irb.  Just use it for simple debugging for now, though.
+
+    gem install pry
+
+   usage:
+    require "pry"  # add this to use pry
+
+    # code
+
+    binding.pry   # execution will stop here (place anywhere) 
+
+5.  Using a Debugger
+
+   Pry can be used as a full-fledged debugger, allowing us to step into functions and systematically walk through code. 
+
+
+----------
+Pass-by-Reference vs Pass-by-Value 
+and 
+Variables as Pointers
+------------------------------------------------------------
+https://launchschool.com/lessons/a0f3cd44/assignments/4b1ad598
+
+    def my_method(arr, value)
+      value.capitalize!     # mutates caller (destructive)
+      value.capitalize      # doesn't mutate (non-destructive)
+      arr = arr << value    # mutates caller
+      arr = arr + value     # doesn't mutate
+    end
+
+
+-----------------
+Variables as Pointers
+--------------------
+https://launchschool.com/books/ruby/read/more_stuff#variables_as_pointers
+
+Note that some operations will mutate the actual address space in memory to which a variable points but others will simply change the place in memory to which a variable is pointing.  Below, the first example simply changes the place to which a variable points but the second mutates the address space in memory.
+
+    a = 'hi there'
+    b = a
+    a = 'not here'   # b => 'hi there' (doesn't change)
+
+    a = 'hi there'
+    b = a
+    a << ", Bob"     # b => 'hi there, Bob' (changes)  
+
+
+--------------
+Variable Reference
+and
+Mutability of Objects
+---------------------
+    Use Object.object_id whenever you have trouble understanding why an object has an expected value.
+
+    greeting = 'Hello"
+    greeting.object_id   # => 70101471431160
+
+    nil.object_id
+    => 8
+
+
+* array.delete .fill and .insert mutate original object 
+strings
+* Whether or not a method can modify an argument depends in part on the mutability or immutability of the object represented by the argument, and also on how the argument is passed to the method.
+* Some languages make copies of method arguments, passing the copies to the method --  these cannot modify the original object passed and they're said to be passed by value.
+* Other languages pass references to the method instead, which can be used to modify the original object --  these are said to be passed by reference
+* Many languages use both approaches.
+
+
+https://launchschool.com/blog/references-and-mutability-in-ruby
+https://launchschool.com/blog/mutating-and-non-mutating-methods
+https://launchschool.com/blog/object-passing-in-ruby
+
+
+
+----------
+Mutating and Non-Mutating Methods
+w/special attention 
+to concatenation and assignments
+---------------------------------
+    * immutable objects seem to be passed by value
+    * mutable objects seem to be passed by reference
+    * assignment can break the binding between an argument name and the object it references
+    * +=, -=, *=, /= and %= do not mutate, they create a new object
+    * Most methods do not mutate arguments or caller
+    * Some methods  mutate the caller
+    * Few methods mutate the arguments
+    * '=' acts like a non-mutating method
+    * All methods are non-mutating w/respect to immutable objects (int, bool, etc.)
+    * String#sub! is mutating w/respect to String used to call it but not w/respect to its arguments
+    
+    * indexed assignment is mutating (i.e., str[3] = 'x')
+    * assignments in array elements create new objects but the mutated array (collection of elements) is still the same object overall)
+    * Concatentation (<<) mutates, i.e., arr << 'new item'
+    * some classes use '<<' for bit shift operations, which are usually non-mutating
+    * Setters are mutating (class setter methods, i.e., person.name = 'Bill', person.age = 23)
+    * '!' at the end of a method name is a good indication that it mutates its caller, but not all mutating methods use '!'
+
+
+
+  def fix(value)    # this method mutates s, passed as a parameter 
+    value.upcase!
+    value.concat('!')
+    value
+  end 
+
+  s = 'hello'
+  t = fix(s)
+
+
+
+  def fix(value)    # this method doesn't mutate s
+    value = value.upcase
+    value.concat('!')
+  end
+
+  s = 'hello'
+  t = fix(s)
+
+
+
+  def fix(value)    # this method 
+    puts "initial object def fix(value)
+    puts "initial object #{value.object_id}"
+    value = value.upcase
+    puts "upcased object #{value.object_id}"
+    value.concat('!')
+  end
+
+  s = 'hello'
+  puts "original object #{s.object_id}"
+  t = fix(s)
+  puts "final object #{t.object_id}"
+
+
+
+# re: '-=, *=, +=, and %= cause the target ot reference a possibly-different object'
+  -- def fix(value)
+  --   value = value.upcase!
+  --   value.concat('!')
+  -- end
+  => :fix
+
+  >> s = 'hello'
+  => "hello"
+
+  >> s.object_id
+  => 70363946430440
+
+  >> t = fix(s)
+  => "HELLO!"
+
+  >> s
+  => "HELLO!"
+
+  >> t
+  => "HELLO!"
+
+  >> s.object_id
+  => 70363946430440
+
+  >> t.object_id
+  => 70363946430440
+
+
+
+-----------------
+Object Passing in Ruby
+i.e.,
+pass-by-reference 
+&
+pass-by-value
+-------------------------
+https://launchschool.com/blog/object-passing-in-ruby
+
+* Ruby uses strict evaluation exclusively.
+* The two most common strict eval. strategies are pass-by-value and pass-by-reference, both known as object-passing strategies.
+* Understanding these strategies --  which is used and when -- is key to understanding what happens to an object that gets passed to a method.
+
+Ruby:
+  * Can be considered as pass-by-reference (exclusively, many say)
+  * However, in Ruby, assignment is pass-by-value (non-mutating, makes a copy)
+  * Because of these contradictions, Ruby is referred to as 'pass by reference value', 'pass by reference of the value' or 'pass by the value of the reference' --- Ruby passes around copies of the references, a blend of the two strategies and so it is purely neither alone
+  * Pass-by-reference is accurate so long as you account for assignment and immutability (assignment acts like pass-by-value as do immutable objects)
+
+
+QUIZ NOTES:
+    * When an object is passed to a method call as an argument, parameter assigned to it acts as a pointer to the original object
+    * Re-assigning a variable within a method doesn't affect the object that the variable is point ot outside of the method
+    * it's possible for an operation within the method to mutate the original object outside of the method
+
+
+If pass by value is employed for immutable objects, but all variables are references, then what exactly is happening when we pass an immutable object? Let’s run a short test:
+
+  def print_id number
+    puts "In method object id = #{number.object_id}"
+  end
+
+  value = 33
+  puts "Outside method object id = #{value.object_id}"
+  print_id value 
+
+  
+  =>  Outside method object id = 67
+  =>  In method object id = 67
+  
+  number and value reference the same object, despite it being immutable
+  
+
+
+----------
+Coding Tips
+------------
+
+* A method should do one thing well and shouldn't mix up concerns, i.e., a method should return or print/output or mutate, but not more than one of these and should be well-named so that it's like a black box --  easy to use and understand what to use it for (get_value, print_value, add_value!)
+
+* Don't mutate a collection while iterating through it (make a copy and iterate through the original while changing the copy)
+
+* Don't use assignment inside a conditional (assign an empty-valued variable before the conditional and then use it inside the conditional
+
+* Don't use assignments as conditionals (but if you must, enclose them in parenthesese, i.e., 
+      numbers = [1, 2, 3, 4, 5]
+      while (num = numbers.shift)
+        puts num
+      end
+
+* Use underscores for unused parameters in iterations
+      names = ['kim', 'joe', 'david', 'black']
+      names.each { |_| puts "got a name!" }
+
+
+      names.each_with_index do |_, idx|
+        puts "#{idx+1}, got a name!"
+      end
+
+
+
+---------
+Loops
+------------
+  arr = [1, 2, 3, 4, 5]
+  counter = 0
+
+  loop do
+    arr[counter] += 1
+    counter += 1
+    break if counter == arr.size
+  end
+
+  arr # => {2, 3, 4, 5, 6]
+
+
+------
+Arrays
+---------
+result << str[start_substring_idx..end_substring_idx]  # puts substring from start to end into result 
+
+
+------------------------------------------------------------------
+PEDAC Proess
+======================================================================--
+  P - [Understand the] Problem
+  E - Examples / Test Cases
+  D - Data Structure
+  A - Algorithm
+  C - Code
+
+  Helps you solve complex problems efficiently.  
+
+-----------------------------------------------------------
+P - [Understand the] Problem
+  1.  Read the problem description.
+  2.  Check the test cases, if any.
+  3.  If any part of the problem is unclear, ask interviewer/requester to clarify the matter.
+
+
+    Questions to Ask:
+    *  What do I do with invalid input/Can I assume valid input?
+    *  What should I do with empty input?
+    *  Should my methods be mutating or non-mutating?
+    *  Details of task ... ?
+
+    To-Do:
+    *  Verify your assumptions
+    *  Write down inputs and outputs of the problem
+    *  Describe the rules you must follow --  ID and write out explicit rules; ID and write out implicit rules
+
+
+
+    Ex.--
+    # -----------------------------------------------------------
+    # PROBLEM:
+
+    # Given a string, write a method change_me which returns the same
+    # string but with all the words in it that are palindromes uppercased.
+  
+    # change_me("We will meet at noon") == "We will meet at NOON"
+    # change_me("No palindromes here") == "No palindromes here"
+    # change_me("") == ""
+    # change_me("I LOVE my mom and dad equally") == "I LOVE my MOM and DAD equally" 
+
+    # --------------------------------------------------------------
+        # input: string
+        # output: string (not the same object)
+        # rules:
+        #      Explicit requirements:
+        #        - every palindrome in the string must be converted to
+        #          uppercase. (Reminder: a palindrome is a word that reads
+        #          the same forwards and backward).
+        #        - Palindromes are case sensitive ("Dad" is not a palindrome, but "dad" is.)
+
+        #      Implicit requirements:
+        #        - the returned string shouldn't be the same string object.
+        # -----------------------------------------------------------
+
+
+Data Structure / Algorithm
+--------------------------
+* Data structure choice influenes algorithm design, so choose both together
+* Be sure to provide sufficient detail when writing algorithms
+
+
+    Ex.-
+    --------------------------------------------------------
+    # PROBLEM:
+
+    # Given a string, write a method `palindrome_substrings` which returns
+    # all the substrings from a given string which are palindromes. Consider
+    # palindrome words case sensitive.
+  
+    # Test cases:
+
+    # palindrome_substrings("supercalifragilisticexpialidocious") == ["ili"]
+    # palindrome_substrings("abcddcbA") == ["bcddcb", "cddc", "dd"]
+    # palindrome_substrings("palindrome") == []
+    # palindrome_substrings("") == []
+
+    
+        # Some questions you might have?
+        # 1. What is a substring?
+        # 2. What is a palindrome?
+        # 3. Will inputs always be strings?
+        # 4. What does it mean to treat palindrome words case-sensitively?
+
+        # input: string
+        # output: an array of substrings
+        # rules:
+        #      Explicit requirements:
+        #        - return only substrings which are palindromes.
+        #        - palindrome words should be case sensitive, meaning "abBA"
+        #          is not a palindrome.
+
+
+        # Algorithm:
+        #  - initialize a result variable to an empty array
+        #  - create an array named substring_arr that contains all of the
+        #    substrings of the input string that are at least 2 characters long.
+        #  - loop through the words in the substring_arr array.
+        #  - if the word is a palindrome, append it to the result
+        #    array
+        #  - return the result array
+
+         It looks complete, but let's think about it for a moment: 
+           * what is the hardest part of this problem? 
+           * Is it looping through an array and pushing substrings that are palindromes in the result array? 
+           * Is it determining whether a substring is a palindrome? Is it something else entirely?
+
+
+
+      # - create an empty array called `result` that will contain all
+      #   the required substrings
+      # - initialize variable start_substring_idx and assign 0 to it.
+      # - initialize variable end_substring_idx and assign value of
+      #   start_substring_idx + 1 to it.
+      # - Enter loop which will break when start_substring_idx is equal
+      #     to str.size
+      #   - Within that loop enter another loop that will break if
+      #     end_substring_idx is equal to str.size
+      #     - append to the result array part of the string from
+      #       start_substring_idx to end_substring_idx
+      #     - increment `end_substring_idx` by 1.
+      #   - end the inner loop
+      #   - increment `start_substring_idx` by 1.
+      #   - reassign `end_substring_idx` to `start_substring_idx += 1`
+      # - end outer loop
+      # - return `result` array
+
+    The code for this might look like this :
+  
+      def substrings(str)
+        result = []
+        start_substring_idx = 0
+        end_substring_idx = start_substring_idx + 1
+        loop do
+          break if start_substring_idx == str.size
+          loop do
+            break if end_substring_idx == str.size
+            result << str[start_substring_idx..end_substring_idx]
+            end_substring_idx += 1
+          end
+          start_substring_idx += 1
+          end_substring_idx = start_substring_idx + 1
+        end
+        result
+      end
+
+
+Here's the complete pseudocode for this problem:
+-----------------------------------
+# input: a string
+# output: an array of substrings
+# rules: palindrome words should be case sensitive, meaning "abBA"
+#        is not a palindrome
+
+# Algorithm:
+#  substrings method
+#  =================
+#  - create an empty array called `result` which will contain all
+#    the required substrings
+#  - initialize variable start_substring_idx and assign 0 to it.
+#  - initialize variable end_substring_idx and assign value of
+#    start_substring_idx + 1 to it.
+#  - Enter loop which will break when start_substring_idx is equal
+#      to str.size - 1
+#    - Within that loop enter another loop which will break if
+#      end_substring_idx is equal to str.size
+#      - append to the result array part of the string from
+#        start_substring_idx to end_substring_idx
+#      - increment `end_substring_idx` by 1.
+#    - end the inner loop
+#    - increment `start_substring_idx` by 1.
+#    - reassign `end_substring_idx` to `start_substring_idx += 1`
+#  - end outer loop
+#  - return `result` array
+
+#  is_palindrome? method
+#  =====================
+#  - check whether the string value is equal to its reversed
+#    value. You can use the String#reverse method.
+
+#  palindrome_substrings method
+#  ============================
+#  - initialize a result variable to an empty array
+#  - create an array named substring_arr that contains all of the
+#    substrings of the input string that are at least 2 characters long.
+#  - loop through the words in the substring_arr array.
+#    - if the word is a palindrome, append it to the result
+#      array
+#  - return the result a rray
+
+
+
+The code for this with all the helper methods :
+------------------------------------------
+def substrings(str)
+  result = []
+  start_substring_idx = 0
+  end_substring_idx = start_substring_idx + 1
+  loop do
+    break if start_substring_idx == (str.size - 1)
+    loop do
+      break if end_substring_idx == str.size
+      result << str[start_substring_idx..end_substring_idx]
+      end_substring_idx += 1
+    end
+    start_substring_idx += 1
+    end_substring_idx = start_substring_idx + 1
+  end
+  result
+end
+
+def is_palindrome?(str)
+  str == str.reverse
+end
+
+def palindrome_substrings(str)
+  result = []
+  substrings_arr = substrings(str)
+  substrings_arr.each do |substring|
+    result << substring if is_palindrome?(substring)
+  end
+  result
+end
+
+
+
+# alternate version of substrings:
+def substrings(str)
+  result = []
+  0.upto(str.size - 2).each do |start_idx|
+    (start_idx + 1).upto (str.size - 1) do |end_idx|
+      result << str[start_idx..end_idx]
+    end
+  end
+  result
+end
+
+
+
+------------------------------------------------------
+Selection and Transformation
+================================----------------------------
+select    returns a new array based on the block's return value.  If the return value evaluates to true, then the element is selected.
+
+map       returns a new array based on the block's return value.  Each element is transformed based on the return value.
+
+Elements of a loop:
+* a loop
+* a counter
+* a way to retrieve the current value
+* a way to exit the loop
+S & T also require:
+* criteria, i.e., selection uses these to determine what to select; transformation uses it to determine how to perform the transformation
+
+
+Selection example:
+  alphabet = 'abcdefghijklmnopqrstuvwxyz'
+  selected_chars = ''
+  counter = 0
+
+  loop do
+    current_char = alphabet[counter]
+
+    if current_char == 'g'
+      selected_chars << current_char    # appends current_char into the selected_chars string
+    end
+
+    counter += 1
+    break if counter == alphabet.size
+  end
+
+  selected_chars # => "g"
+
+
+Ex2-
+
+def select_vowels(str)
+  selected_chars = ''
+  counter = 0
+
+  loop do
+    current_char = str[counter]
+
+    if 'aeiouAEIOU'.include?(current_char)
+      selected_chars << current_char
+    end
+
+    counter += 1
+    break if counter == str.size
+  end
+
+  selected_chars
+end
+
+
+
+Ex.- select_fruit.rb
+
+produce = {
+  'apple' => 'Fruit',
+  'carrot' => 'Vegetable',
+  'pear' => 'Fruit',
+  'broccoli' => 'Vegetable' 
+}
+
+def select_fruit(hash)
+  produce_keys = produce_list.keys
+  counter = 0
+  selected_fruits = {}
+
+  loop do
+    break if counter == produce_keys.size
+
+    current_key = produce_keys[counter]
+    courrent_value = produce_list[current_key]
+
+    if courrent_value == 'Fruit'
+      selected_fruits[current_key] = courrent_value
+    end
+
+    counter += 1
+  end
+
+  selected_fruits
+end
+
+puts select_fruit(produce)  # => {"apple"=>"Fruit", "pear"=>"Fruit"}
+
+
+
+
+Ex.-
+def double_numbers(numbers)
+  doubled_numbers = []
+  counter = 0
+
+  loop do
+    break if counter == numbers.size
+
+    current_number = numbers[counter]
+    doubled_numbers << current_number * 2
+
+    counter += 1
+  end
+
+  doubled_numbers
+end
+
+
+
+
+Ex.-
+def general_select(produce_list, selection_criteria)
+  produce_keys = produce_list.keys
+  counter = 0
+  selected_produce = {}
+
+  loop do
+    break if counter == produce_keys.size
+
+    current_key = produce_keys[counter]
+    current_value = produce_list[current_key]
+
+    # used to be current_value == 'Fruit'
+    if current_value == selection_criteria
+      selected_produce[current_key] = current_value
+    end
+
+    counter += 1
+  end
+
+  selected_produce
+end
+
+
+
+Method	  Action	      Considers block return value?	 Returns new collection?	 Length of returned collection
+------    ---------     -----------------------------  -----------------------   -----------------------------
+each	    Iteration	    No	                           No, returns original	     Length of original
+select	  Selection	     Yes, its truthiness	         Yes	                     Length of original or less
+map	      Transformation	 Yes	                       Yes	                     Length of original
+
+
+
+each              iterates through all members of a collection
+each_with_index     similar to each; takes 2nd argument representing element's index; w/hashes, returns a pair array for first argument
+each_with_object    similar to each but takes a method argument; the block takes two arguments as well
+select            creates a new collection from a given collection with members that pass criteria given
+map     creates a new collection from a transformation performed on all members of a given collection
+any     returns true if a block condition is true for any element passed from a collection
+all     simiar to any but returns true only if all elements pass condition in block
+first     returns first or first(number) of elements; calling w/number on a hash returns a nested array
+include?   returns true if argument exists in collection, false if not; w/hash, only checks keys (like Hash#key? or Hash#has_key?)
+partition   divides up elements in current collection into two collection depeding on block's return value
+
+
+QUIZ NOTES:
+-----------
+  * When each is called with a block on an array, it returns the array objet that it was called on
+  * If we try to initialize a hash w/ duplicate keys, the second key overwrites the first, giving a warning
+  * If map was called w/ a block on an array containing 5 items, the return value would be an array containing five items
+  * Enumerable#map and Enumerable#collect perform the same function
+  * When called on a hash, map returns an array
+  * If map is called on a block that returns nil (such as with puts as last line), it returns an array with nil in the positions of the inputs which returned nil
+  * map returns a new array (i.e., it's non-mutating)
+  * reject returns the items  
+
+
+Examples:
+--------
+  { a: "ant", b: "bear", c: "cat" }.any? do |key, value|
+    value.size > 4
+  end
+  # => false
+
+
+  { a: "ant", b: "bear", c: "cat" }.all? do |key, value|
+    value.length >= 3
+  end
+  # => true
+
+
+  { a: "ant", b: "bear", c: "cat" }.each_with_index do |pair, index|
+    puts "The index of #{pair} is #{index}."
+  end
+
+  # The index of [:a, "ant"] is 0.
+  # The index of [:b, "bear"] is 1.
+  # The index of [:c, "cat"] is 2.
+  # => { :a => "ant", :b => "bear", :c => "cat" }
+
+  
+  [1, 2, 3].each_with_object([]) do |num, array|
+    array << num if num.odd?
+  end
+  # => [1, 3]
+
+
+  { a: "ant", b: "bear", c: "cat" }.each_with_object([]) do |pair, array|
+    array << pair.last
+  end
+  # => ["ant", "bear", "cat"]
+
+
+  { a: "ant", b: "bear", c: "cat" }.each_with_object({}) do |(key, value), hash|
+    hash[value] = key
+  end
+  # => { "ant" => :a, "bear" => :b, "cat" => :c }
+
+
+  [1, 2, 3].partition do |num|
+    num.odd?
+  end
+  # => [[1, 3], [2]]
+
+
+  odd, even = [1, 2, 3].partition do |num|
+    num.odd?
+  end
+
+  odd  # => [1, 3]
+  even # => [2]
+
+
+  [1, 2, 3].select do |num|
+    num > 5
+    'hi'
+  end
+
+  # => [1, 2, 3]  (This is because 'hi' is truthy so block returns true for each value and select adds it to the selection)
+
+
+
+-----------
+Scope
+---------------
+* Local variables initialized outside of a method can't be accessed from within the method definition
+* Local variables initialized outside of a block (in the outer scope) can be accessed from within the block's inner scope.  Inside the block, both the local variable and the method are in scope, but by default Ruby first references the local variable.
+
+
+
+------
+Sort
+--------
+array.sort      uses <=> to sort items of the same type; can be used w/ a block which must return 1, 0 or -1
+array.sort_by  must be used with a block; takes one arg, 
+    ex. --
+      string_array.sort_by { |string| string.length }
+
+<=> (spaceship moderator) compares two objects of the same time, returning -1. 0 or 1 depending on whether first object is less than, equal to or greater than the second objecct
+
+return value of <=> is used by sort; a nil return throws an argument error
+
+String.ord  determines a string's ASCII position (ASCIIbetical order)
+  * uppercase letters come before lowercase
+  * digits and (most) punctuation come before letters
+  * there's an extended ASCII table containing accented & other characters which comes after the main ASCII table
+-----
+[2, 5, 3, 4, 1].sort do |a, b|
+  a <=> b
+end
+# => [1, 2, 3, 4, 5]
+-----
+
+--------------
+Nested Data Structures
+======================
+* remember:  variables as pointers
+a = [1, 3]
+b = [2]
+arr = [a, b]
+arr # => [[1, 3], [2]]
+
+a[1] = 5
+arr # => [[1, 5], [2]]
+
+arr[0][1] = 8
+arr # => [[1, 8], [2]]
+a   # => [1, 8]
+
+arr[0][1] = 8
+arr # => [[1, 8], [2]]
+a   # => [1, 8]
+
+------------------
+arr.dup    copies an object (shallow copy:  doesn't copy objects within object; allows objects within copied object to be modified
+
+arr.clone  also copies an object (shallow copy) and *preserves the frozen state of the object*
+-----------
+arr1 = ["a", "b", "c"]
+arr2 = arr1.dup
+arr2[1].upcase!
+
+arr2 # => ["a", "B", "c"]
+arr1 # => ["a", "B", "c"]
+---------------
+arr1 = ["abc", "def"]
+arr2 = arr1.clone
+arr2[0].reverse!
+
+arr2 # => ["cba", "def"]
+arr1 # => ["cba", "def"]
+---------------
+(Changing the array, not the elements)
+arr1 = ["a", "b", "c"]
+arr2 = arr1.dup
+arr2.map! do |char|
+  char.upcase
+end
+
+arr1 # => ["a", "b", "c"]
+arr2 # => ["A", "B", "C"]
+----------------
+(Changing the elements)
+arr1 = ["a", "b", "c"]
+arr2 =arr1.dup
+arr2.each do |char|
+  char.upcase!
+end
+
+arr1 # => ["A", "B", "C"]
+arr2 # => ["A", "B", "C"]
+
+
+Freezing Objects
+----------------
+arr1 = ["a", "b", "c"].freeze
+arr2 = arr1.clone
+arr2 << "d"
+# => RuntimeError:  can't modify frozen Array
+---------
+arr1 = ["a", "b", "c"].freeze
+arr2 = arr1.dup
+arr2 << "d"
+
+arr2 # => ["a", "b", "c", "d"]
+arr1 # => ["a", "b", "c"]
+--------
+5.frozen? # => true
+--------
+Freeze only freezes the object it's called on, 
+not any objects inside that object:
+arr = [[1], [2], [3]].freeze
+arr[2] << 4
+arr # => [[1], [2], [3, 4]]
+--------
+arr = ["a", "b", "c"].freeze
+arr[2] << "d"
+arr # => ["a", "b", "cd"]
+--------
+
+
+
+--------
+Blocks
+========
+[[1, 2], [3, 4]].each do |arr|
+  puts arr.first
+end
+# 1
+# 3
+# => [[1, 2], [3, 4]]
+  * puts returns nil so the block returns nil
+  * each doesn't look at the block return but returns the calling object
+--------
+  * Type of action being performed (method call, block, conditional, etc.)?
+  * What object is action being performed on?
+  * Side-effect of that action (e.g. output or destructive action)?
+  * Return value of action?
+  * Is return vlaue used by whatever instigated the action?
+
+Line	  Action	            Object	        Side Effect	 Return Value	        Is Return Value Used?
+----    ------              -----           ----------   ------------         --------------------
+1	      method call (each)	outer array	        None	     The calling object	    No, but shown on line 6
+1-3	    block execution	    Each sub-array	    None	      nil	                    No
+2	      method call (first)	Each sub-array	    None	      sub-arr elem @ idx 0 	Yes, used by puts
+2	      method call (puts)	sub-arr elem@idx 0 	string rep of int	nil	            Yes, used to determine return value of block
+-------------
+
+[[1, 2], [3, 4]].map do |arr|
+  puts arr.first
+end
+# 1
+# 3
+# => [nil, nil]
+  * block/puts returns nil and map maps nil to the output for each subarray
+  * 1 and 3 are also printed out via puts
+------------
+
+[[1, 2], [3, 4]].map do |arr|
+  puts arr.first
+  arr.first
+end
+  * # => [1, 3]
+
+  * Type of action:  method call (map)
+  * object performed on:  array ([[1,2],[3,4]]
+  * side-effects: array is mutated to [1,3]
+--------------
+
+my_arr = [[18, 7], [3, 12]].each do |arr|
+  arr.each do |num|
+    if num > 5
+      puts num
+    end
+  end
+end 
+
+  * # => [[18,7],[3,12]]
+  * each returns calling object
+  * also puts each num greater than 5 (18, 7, 12)
+----------------
+
+[[1, 2], [3, 4]].map do |arr|
+  arr.map do |num|
+    num * 2
+  end
+end
+
+  * # => [[2,4],[6,8]]
+  * inner block returns each num transformed
+  * outer block returns each set of nums in new array
+--------------
+Ex. 6
+[{ a: 'ant', b: 'elephant' }, { c: 'cat' }].select do |hash|
+  hash.all? do |key, value|
+    value[0] == key.to_s
+  end
+end
+# => [{ :c => "cat" }]
+  * ant is dropped because one element in that hash (elephant) doesn't match its key
+  * cat is included because all elements (1) in that hash pass the test
+  * the test is that the first letter of the value matches the key for all hash items
+-----------
+Ex. 7
+arr = [['1', '8', '11'], ['2', '6', '13'], ['2', '12', '15'], ['1', '8', '9']]
+
+arr.sort # => [["1", "8", "11"], ["1", "8", "9"], ["2", "12", "15"], ["2", "6", "13"]]
+
+
+arr.sort_by do |sub_arr|
+  sub_arr.map do |num|
+    num.to_i
+  end
+end
+
+# => [["1", "8", "9"], ["1", "8", "11"], ["2", "6", "13"], ["2", "12", "15"]]
+  * Sorts the original, outer array by comparing the transformed integers in the inner arrays
+---------------
+Ex. 8
+[[8, 13, 27], ['apple', 'banana', 'cantaloupe']].map do |arr|
+  arr.select do |item|
+    if item.to_s.to_i == item    # if it's an integer
+      item > 13
+    else
+      item.size < 6
+    end
+  end
+end
+
+# => [[27], ["apple"]]
+  * a boolean is returned from innermost blocks (item > 13 and item.size < 6)
+  * this boolean is used by select to return elements passing tests based on whether they are an int or not
+  * map uses the selected items to create a new array
+  * item.to_s.to_i == item  is an imperfect test to check if an item is an int
+------------------
+Ex. 9
+[[[1], [2], [3], [4]], [['a'], ['b'], ['c']]].map do |element1|
+  element1.each do |element2|
+    element2.partition do |element3|
+      element3.size > 0
+    end
+  end
+end
+# => [[[1], [2], [3], [4]], [["a"], ["b"], ["c"]]]
+  * each doesn't care about the block's return value and always returns calling object
+  * line 2 tells us everything we need to know -- map returns a new array that matches the value of the calling object
+  * there are no side-effects deeper in the code
+----------------------
+Ex. 10
+[[[1, 2], [3, 4]], [5, 6]].map do |arr|
+  arr.map do |el|
+    if el.to_s.size == 1    # it's an integer
+      el + 1
+    else                    # it's an array
+      el.map do |n|
+        n + 1
+      end
+    end
+  end
+end
+
+# => [[[2,3], [4,5]], [6,7]]
+  * Once we get down to int level, add 1 and map it to a new array to return
+  * if we're not at int level, dig one level down further and add 1, returning it to a new mapped array
+  * This is bad design, but it's good to know how to handle it
+--------------------
+
+
+-----------
+Mutating Collections While Iterating
+-----------------------------------
+  * Do not mutate the collection that you're iterating through (not even selection or transformation)
+  * The reason for this is that changing the contents of an array during iteration leads to skipping of elements and other undesirable behavior 
+  * Instead, make a copy of the array --  iterate through the original and alter the copy or vice versa --  just don't do both on the same object
+
+-------
+# What not to do:
+# The method remove_evens! should delete all even numbers from the array passed in as the argument.
+
+def remove_evens!(arr)
+  arr.each do |num|
+    if num % 2 == 0
+      arr.delete(num)
+    end
+  end
+  arr
+end
+
+p remove_evens!([1,1,2,3,4,6,8,9])
+# expected return value [1, 1, 3, 9]
+# actual return value [1, 1, 3, 6, 9]
+  * This happens because each operates by index number and when an item is deleted, the idexes are thrown off and an item is skipped as a result
+---------
+# a fix:
+def remove_evens!(arr)
+  cloned_arr = arr.dup
+  cloned_arr.each do |num|
+    if num % 2 == 0
+      arr.delete(num)
+    end
+  end
+  arr
+end
+
+
+--------
+Tips on Analyzing Code
+----------------------
+* if code appears opaque or complex, break it down step by step
+* if necessary, use a systematic approach such as the tabular method outlined above
+* figure out what's happening at each step and pay attention to:
+  --return value
+  --side-effects
+* pay attention to return values of all statements in your code, especially where implicit return values are being relied on
+* make sure to have a clear understanding of underlying concepts such as data structure, loops, iterative methods and the blocks passed to them (go back over earlier assignments if necessary and check the Ruby documentation)
+* be clear about the method implementation of the iterative method(s) being used, especially:
+  * what values are passed to the block
+  * what the method does with the return value of the block
+
+  * Focus on:
+    * structure of collection object
+    * return value of blocks and methods
+    * side-effects of any methods
+
+
+
+------
+Pry
+==========
+require 'pry' # place at top of program as an include
+
+binding.pry  # place in location you want to break out of execution
+    * A binding is something that contains references to any variables that were in scope at the point where it was created
+    * pry interrupts program execution and pries open the binding so that we can have a look around
+
+
+Types of Errors:
+* Syntax errors --  grammatical language errors
+* Logical errors -- program doesn't do what you expect logically, thread goes off-course
+
+Pry commands
+---------------
+cd   change context into that of a variable, e.g., cd arr
+ls      list all methods available in the current context
+show-doc [method name]  show documentaion for a particular method
+cd ..   like w/linux --  switch scope context up one level 
+cd -   switch between the last two scope contexts
+cd /     switch back to top-level scope
+whereami  shows your current context
+exit!         exit out of pry
+exit-program  exit all pry bindings
+ctrl+d    move to next binding
+
+pry-byebug  extends pry w/additional commands
+  * next
+  * step
+  * coontinue
+
+(similarly, there are gems like pry-nav and pry-debugger)
+
+
+-----
+Splat Operator
+=============
+brd.values_at(*line).count(PLAYER_MARKER) == 3  # see tictactoe.rb in rb101/lesson_6
+*  splat -- like a wildcard, allows you to check all values:w
+
+
+
+--------
+Useful Built-in Methods
+======================
+.inspect    gives a more formal print-out of a variable value
+.object_id              prints the object ID of an object
+.public_methods.inspect  prints all the public methods available for an object  
+.public_methods(false).inspect  prints only public methods in the reciever (not inherited methods)
+
+
+
+-------------------
+Syntactical Sugar/short-hand
+============================
+These two lines are equivalent (the bottom is preferred):
+['2', '3'].map { |element| element.to_i } 
+['2', '3'].map(&:to_i)
+
+Equivalent:
+(5..10).inject { |sum, n| sum + n }  # 45
+(5..10).reduce(:+)                   # 45
+
+
+----------
+Deep Copy
+============
+array.load(array.dump(a))
+array1.each { |elem| array2 << elem.dup }
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,714 @@
+---------------------------------------------------------------------------
+                                      __                          
+-__ /\         ,,                    /  -,         ,              
+  || \,        ||                   ||   )        ||              
+ /|| /   \\ \\ ||/|, '\\/\\        ~||---)  /'\\ =||=  _-_   _-_, 
+ \||/-   || || || ||  || ;'        ~||---, || ||  ||  || \\ ||_.  
+  ||  \  || || || |'  ||/          ~||  /  || ||  ||  ||/    ~ || 
+_---_-|, \\/\\ \\/    |/            |, /   \\,/   \\, \\,/  ,-_-  
+                     (            -_-  --~                        
+                      -_-                                         
+Ruby Notes
+Partially From 'Introduction to Programming' (with Ruby)
+Launch School -- Dan Ashcom 09/2019
+----------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+
+------
+Style
+--------
+https://rubystyle.guide/
+
+* set tab function in editor to 2 spaces and set indenting to use spaces
+* use snake_case to define or initialize a method, variable, or file
+  # Naming a file
+  this_is_a_snake_cased_file.rb
+
+  # Assigning a variable
+  forty_two = 42
+
+  # Defining a method
+  def this_is_a_great_method
+    # do stuff
+  end
+
+* use ALL-CAPS for constants
+  # Constant declaration
+  FOUR = 'four'
+  FIVE = 5
+
+* when working with do...end blocks, prefer {} when the entire code expression fits on one line.
+  # Multi-line vs single line
+  [1, 2, 3].each do |i|
+    # do stuff
+  end
+
+  [1, 2, 3].each { |i| # do stuff }
+
+* Use CamelCase to declare a class name
+  # Class naming
+  class MyFirstClass
+  end
+
+  class MySecondClass
+  end
+
+
+
+-------
+RVM
+--------
+Ruby Version Management -- allows you to have multiple versions of Ruby installed for compatibility and switch easily between them (each must have its own gems installed individally)
+http://www.rvm.io/
+
+
+--------
+About Versions
+--------------
+* Be sure to check the documentation that matches your version
+* Features are sometimes added or deprecated
+
+--------------------
+General Tips/Strategies
+--------------------
+* Always pay attention to whether or not a method mutates a caller, i.e., whether it directly changes  an address in memory space, or whether it simply changes the location to which a variable points
+* Play around with code in irb to better understand how it works
+* ! changes the object on which it was called, even when the process is called via assignment to a different variable -- it still mutates the original, i.e., c = a.uniq! assigns c and also mutates a
+
+
+
+
+------------------
+Sublime Setup
+-----------------
+In Sublime Text 3, Go to Preferences -> Settings. On the right side you will see a tab named Preferences.sublime-settings -- User, and you can put this at the bottom of the file:
+
+"tab_size": 2,
+"translate_tabs_to_spaces": true
+
+
+-------------------
+Ruby Documentation
+----------------------
+https://docs.ruby-lang.org/en/
+OLD (use for Core API docs):  https://ruby-doc.org
+
+  ::	class methods
+  #	instance methods
+
+  ex. --  Array#size, Range::new, Hash::new, String#size
+
+  *Their use here in Ruby documentation is completely different from their use in actual code.
+    Core API Documentation    
+    https://ruby-doc.org/core-2.1.2/String.html
+
+
+    Control Statements -- info. on while, for, other flow control
+    https://docs.ruby-lang.org/en/2.6.0/syntax/control_expressions_rdoc.html
+
+    
+    Literals -- info. on data types, i.e., bool, nil, numbers, strings, symbols, arrays, hashes, ranges, regular expressions, procs 
+    https://docs.ruby-lang.org/en/2.6.0/syntax/literals_rdoc.html
+   
+
+    • Through inheritance, the class you're looking at also has access to methods - both instance and class - documented in the parent class. This section of the page will link to the parent's documentation and is a good followup read if you aren't familiar with the parent object or you aren't finding methods you'd expect to see.
+
+    * The "control expressions" page is where you will find discussions of most language features that control code flow: conditionals (if, unless, case), basic looping (while, until, for), loop termination (break, next), and several other features of the language.
+
+    * while returns nil unless break is used -- all statements return a value and that value is usually nil if not otherwise specified from the last statement executed
+
+
+
+---------------------
+Ruby Gems
+-----------------------
+
+There are two main sides to this term. The first side refers to a collection of Ruby files, or Ruby library, that performs a certain task. The other side refers to the publishing system that is behind organizing, listing, and publishing those libraries, or gems.
+https://rubygems.org/
+
+How to use Gems
+---------------
+	gem install <gem name>
+
+  This works temporarily, but gemfiles are better for keeping track of dependencies for your programs.
+
+https://guides.rubygems.org/rubygems-basics/
+
+
+
+-------------
+Finding Gems
+-------------
+Search command lets you find remote gems and allows for the use of regular 
+expressions.
+
+	$ gem search ^rails
+
+See details
+
+	$ gem search ^rails$ -d
+
+Search using website
+	https://rubygems.org/search?utf8=%E2%9C%93&query=rake
+Installing Gems
+	$ gem install drip
+*You can disable documentation generation using the --no-doc argument when installing gems.
+
+
+Requiring Code
+--------------
+Tip: Passing -r to irb will automatically require a library when irb is loaded.
+	
+% irb -rpp
+>> pp $LOAD_PATH
+[”.../lib/ruby/site_ruby/1.9.1”,
+“.../lib/ruby/site_ruby”,
+“.../lib/ruby/vendor_ruby/1.9.1”,
+“.../lib/ruby/vendor_ruby”,
+“.../lib/ruby/1.9.1”,
+ "."]
+
+% irb -rpp
+>> require ‘ap’
+=> true
+>> pp $LOAD_PATH.first
+“.../gems/awesome_print-1.0.2/lib”
+
+Note: For Ruby 1.8 you must require 'rubygems' before requiring any gems.
+That’s basically it for what’s in a gem. Drop Ruby code into lib, name a Ruby file the same as your gem (for the gem “freewill” the file should be freewill.rb, see also name your gem) and it’s loadable by RubyGems.
+https://guides.rubygems.org/name-your-gem/
+
+Listing Installed Gems
+$ gem list
+
+Uninstalling Gems
+$ gem uninstall drip
+
+Viewing Documentation
+$ ri RBTree
+
+View Documentation of Installed Gems in your Browser
+$ gem server
+*You can access this documentation at http://localhost:8808
+
+Fetching and Unpaking Gems
+$ gem fetch malice
+* Allows you to audit a gem’s contents without installing it
+
+Further Reading
+https://guides.rubygems.org/what-is-a-gem
+https://guides.rubygems.org/command-reference
+
+
+
+
+---------------------------
+Debugging Ruby Code with Pry
+--------------------------------
+
+Pry is a nifty library that doubles as an alternative to irb with a host of awesome features. 
+Gem install pry
+
+
+
+Using Pry for Debugging
+# preparation.rb
+require “pry”
+
+a = [1, 2, 3]
+a << 4
+binding.pry     # execution will pause here, allowing you to inspect all objects
+puts a
+
+What this means is that when your program gets to where binding.pry has been declared, it'll open a new pry session instead of moving on to the next line in the code. This gives you the opportunity to play around with your variables and objects to see why things are not working. This is an extremely powerful debugging technique since it lets you pause execution to inspect the state of all variables and objects at that line of code. After you're done looking at your variables, you can continue the program execution with Ctrl + D.
+
+
+
+-------------
+Ruby Basics
+---------------------------
+
+Strings
+---------
+String Interpolation
+	#{ variable_name }	adds a variable inside string; requires double quotes to work
+	ex. –  “#{ name } is the worst president ever.”
+
+Symbols
+----------
+Symbols are created by placing a colon (:) before a word
+	ex. – 
+		:name
+		:a_symbol
+		:”This is also a symbol”
+These are used when you want to reference something without ever printing it to the screen or changing it.  Symbols are referred to as immutable, which, although not 100% correct, it’s a useful mnemonic for now.  
+
+Numbers
+---------
+	int
+	float
+  
+  * large numbers can be written snake-case style for reading clarity -- 1_987_654_321
+
+nil
+------
+nothing/empty value which doesn’t have a type
+	checking if something is nil:
+		“Hello, World”.nil? 
+		# => false
+		if nil
+		# => false
+
+Type Conversion/Casting
+	‘12’.to_i
+	# => 12
+
+	12.to_f
+	# => 12.0
+
+	12.to_s
+	# => ‘12’
+
+
+
+Basic Data Structures
+-----------------------
+Arrays
+arr = [1, 2, 4]
+arr[0] => 1
+
+
+
+Hashes
+----------
+a_hash =
+{dog: ‘barks’,
+cat: ‘meows’ }
+
+a_hash[cat] => ‘meows’
+
+
+Expressions and Returns
+--------------------------
+Everything in Ruby is an expression and Ruby expressions always return a value (implicit return).
+
+
+puts vs return
+--------------------
+puts just prints to screen, doesn’t return anything (returns nil, technically) –  don’t confuse these two
+
+	a = puts “stuff”
+	puts a => nil 
+	# prints out the return of a, which is nil
+
+
+
+---------
+Variables
+-------------
+
+Getting Data From User
+Name = gets.chomp		# gets gets a string and chomp removes the ‘\n’ from the end (carriage return)
+
+Scope
+---------
+* Note: the key distinguishing factor for deciding whether code delimited by {} or do/end is considered a block (and thereby creates a new scope for variables), is seeing if the {} or do/end immediately follows a method invocation.
+
+ex.--
+arr = [1, 2, 3]
+
+for i in arr do
+  a = 5      # a is initialized here
+end
+
+puts a       # is it accessible here?  Yes – for involves no method invocation
+
+
+Types of Variables
+-------------------	
+Variable        Format
+constant        MY_CONSTANT
+global          $var
+class           @@var
+instance        @var
+local           var
+
+
+
+---------
+Methods
+-------------
+
+Basics
+---------
+def say(param=’default’)
+  # body goes here
+end
+
+
+method invocation –  calling a method
+parameter – data that’s passed to a method, defined in the method declaration head
+arguments – pieces of information sent to a method to be modified
+default paramater – a default value used for a paramater when none is supplied during the method invocation/call
+
+parentheses are optional, another way is:
+	say “hi” => say(“hi”)  # both work
+
+
+
+-------------------
+Method Invocation
+--------------------
+  obj.method
+  method(obj)
+  a_caller.some_method(obj
+
+
+---------------
+Mutating the Caller
+-------------------- 
+  permanently altering an argument when calling a method
+
+
+--------------
+Chaining Methods
+------------------
+  def add_three(n)
+    n + 3
+  end
+  
+  add_three(5).times { puts 'this should print 8 times }
+
+
+
+  "hi there".length.to_s => '8'
+
+
+-----------
+puts vs print vs p
+-----------------
+puts returns nil
+print returns nil
+p returns the value of what's being p'd if it's the last statement in a method and there's no return statement
+
+
+
+
+-----------------------
+Flow Control
+=======================
+
+---------------
+Ternary Operator
+-----------------
+  true ? "this is true" : "this is not true"
+  # A Rubyesque form of the if/else statement
+
+
+---------------
+Case Statement
+-----------------
+--Ex. 1:--
+  a = 5
+  
+  answer = case a
+    when 5
+      "a is 5"
+    when 6
+      "a is 6"
+    else
+      "a is neither 5 nor 6"
+    end
+
+  puts answer
+
+
+
+--Ex. 2:--
+  a = 5
+
+  answer = case
+    when a == 5
+      "a is 5"
+    when a == 6
+      "a is 6"
+    else
+      "a is neither 5 nor 6"
+    end
+
+  puts answer
+
+
+*Note:  Every expression in Ruby evaluates to true when used in flow control expect for false and nil values.
+
+
+
+--------------------------------
+Loops and Iterators
+=====================================
+  *iterable.each do # code end # preferred method
+  *loop is the most generic; 
+  *while returns nil
+  *for returns the collection of elements after it exectues
+
+  redo  --  jumps to start of loop body in while and until loops
+  next  --  effectively jumps to end of innermost loop and resumes execution from that point
+
+
+------------
+each vs map vs select
+-------------
+  each returns the input while map returns the output and select returns only those elements for whom the block is true
+  
+  ex.-  arr = [1,2,3]
+        arr.each   do |x| x*2        => [1,2,3]
+        arr.map    do |x| x*2         => [2,4,6]
+        arr.select do |x| x%2 == 0 => [2] 
+  
+
+  Ex.: Generic Loop (not often used)
+  --------------------------------------
+  loop do
+    puts "This will keep printing til you hit ctrl + c"
+  end
+
+
+  ex.: Do/While Loop
+  ----------------------
+  i = 0
+ 
+  loop do
+    i += 2
+    puts i
+    if i == 10
+      break      # exits loop
+    end
+  end
+
+
+  ex.:  For Loop Using a Range
+  ------------------------------
+  # countdown3.rb
+
+  x = gets.chomp.to_i
+
+  for i in 1..x do
+    puts i
+  end
+
+  puts "Done!"
+
+  
+  Ex.: For Loop Using an Array
+  -------------------------------
+  # countdown4.rb
+
+  x = [1, 2, 3, 4, 5]
+
+  for i in x do
+    puts i
+  end
+
+  puts "Done!"
+
+
+
+  Ex.: Conditional While Loop
+  ----------------------------
+  # conditional_while_loop.rb
+
+  x = 0
+
+  while x <= 10
+    if x.odd?
+      puts x
+    end
+    x += 1
+  end 
+
+  
+
+  Ex.:  Conditional While Loop with Next
+  ----------------------------------------
+  # conditional_while_loop_with_next.rb
+
+  x = 0
+
+  while x <= 10
+    if x == 3
+      x += 1
+      next
+    elsif x.odd?
+      puts x
+    end
+    x += 1
+  end
+
+
+
+  Ex.:  Conditional While Loop with Break
+  ----------------------------------------
+  # conditional_while_loop_with_break.rb
+
+  x = 0
+  
+  while x <= 10
+    if x == 7
+      break
+    elsif x.odd?
+      puts x
+    end
+    x += 1
+  end
+
+
+
+  Ex.:  Each Iterator
+  --------------------
+  # practice_each.rb
+
+  names = ['Bob', 'Joe', 'Steve', 'Janice', 'Susan', 'Helen']
+
+  names.each { |name| puts name }
+
+
+
+  Ex.:  Recursion
+  ------------------
+  def doubler(start)
+    puts start
+    if start < 10
+      doubler(start * 2)
+    end
+  end
+
+
+
+------------------
+Arrays
+=======================
+https://ruby-doc.org/core-2.6.4/Array.html
+
+
+arr[2..3]   select multiple consecutive elements at the same time
+
+Methods
+-------
+first
+last
+push/<<   ('shovel operator')
+pop
+length
+map         iterate over array, applying a block and returning new array of results
+collect     alias to map -- does the same thing
+delete_at   delete a value at a given index
+delete      delete a value without knowing the index -- deletes all instances of a value
+uniq        iterates through array, deleting duplicates, returns result as new array
+uniq!       performs the same function destructively, modifying the original input array
+each        iterate through each value in an array; if no block is given, returns an enumerator
+select      iterates, returns new array with any values that return true to an expression
+unshift     add a value to the beginning of an array
+shift       removes the first element of an array, optional argument denotes first n elements
+include?    checks if argument is included in array, returning boolean
+flatten         turn a nested array into a one-dimensional array
+each_index        iterate through array by reference to index instead of value
+each_with_index   passes value and index to a block of code for manipulation
+sort             returns a new sorted array
+product          combine two arrays into one by creating subarrays of all possible combinations of one element from each array
+compact         remove nil values from an array
+
+
+---------------------
+Hashes
+======================
+
+Usage
+-----
+person = { height: '6 ft', weight: '160 lbs', age: 62 }
+person[:hair] = 'brown'
+person.delete(:age)
+person.merge!(new_hash)
+
+* When deviating from using symbols (:name) as keys, use the old style of assignment (rockets):  [2,3] => 21; 'ten' => 10
+* Hashes maintain the order in which they're stored in Ruby 1.9+ but not prior
+
+
+
+Methods
+--------
+each    iterate over hash elements using both key and value
+has_key?    check if hash contains a specific key; returns a boolean
+has_value?  check if hash contains a specific value; returns a boolean
+select     allows passing a block and returns any key-value pairs that evaluate true when run through the block
+fetch    allows passing a given key and returns the value for that key if it exists.  Can also specify an option for return if that key is not present
+to_a      returns an array version of your hash (non-destructive)
+hash.keys   returns all keys
+hash.values   returns all values 
+
+
+
+--------------------
+Deciding on Hash or Array
+==========================
+
+Ask yourself:
+* Does data need to be associated with a specific label?  (yes: hash)
+* Does order matter?  (yes: array)
+* Do I need a "stack" or a "queue" structure?  (yes: array)
+
+---------------------------------------------------------------------
+  Ex. --
+    #is_anagram.rb
+
+    def is_anagram(words)
+      result = {}
+
+      words.each do |word|
+        key = word.split('').sort.join
+        if result.has_key?(key)
+          result[key].push(word)
+        else
+          result[key] = [word]
+        end
+
+        result.each_value do |v|
+          puts "-----"
+          p v
+        end
+      end
+    end
+
+    words =  ['demo', 'none', 'tied', 'evil', 'dome', 'mode', 'live',
+              'fowl', 'veil', 'wolf', 'diet', 'vile', 'edit', 'tide',
+              'flow', 'neon']
+
+    is_anagram(words)
+--------------------------------------------------------------------
+
+-------------------
+Exception Handling
+=====================
+format:
+--------
+
+begin
+  # perform dangerous operation
+rescue
+  # do this if operation fails
+  # for example, log the error
+end
+
+
+-----------
+Accessing Files
+------------------
+File.open('filename.txt', 'r') do |file|
+  puts file.readline()
+  puts file.readchar()
+  puts file.read().include? "Jim"
+end
+
+
+
+

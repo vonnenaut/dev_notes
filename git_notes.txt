@@ -1,0 +1,42 @@
+Git Notes
+09/2019
+
+cheatsheet:  https://d186loudes4jlv.cloudfront.net/git/images/git_workflow.png
+
+------
+Config
+--------
+https://help.github.com/en/articles/caching-your-github-password-in-git
+git config --global credential.helper cache
+git config --global credential.helper 'cache --timeout=3600'
+/etc/gitconfig      system-wide settings
+~/.gitconfig        user account-specific settings, overrides /etc/gitconfig
+<repo>/.git/config  config specific to a repo
+gitignore           used to prevent files/dir from being added to a repo
+
+
+--------
+Commands
+---------
+git init                  create an empty local repo, adding a .git folder
+git remote add origin URL   connect new local repo with remote gitHub repo -- create gitHub repo and copy link from download/clone option at top-right
+git clone url local-dir   create a local copy of a remote repo
+git status                check which branch you're on, status of added files and whether committed or not
+git add .               stages all files in current dir (replace . with filename(s))
+git commit -m "Descr"   commit staged files
+git log                 show commit history
+git pull                 pull remote changes to local
+git push origin master     push local commits to remote master branch
+git remote add origin url   adds a remote url locally
+git push -u origin master   push local changes remotely, sets upstream tracking branch with -u flag
+git fetch                      get remote changes
+git diff master origin/master   check for differences between local and remote
+git branch [name]           create a new branch
+git checkout branch_name    switch to branch_name
+git merge branch_name       merge a branch into another (checout to other first)
+git branch                list all branches
+git reset --hard        throw away all uncommitted changes
+git reset filename      remove a file from repo without removing it from your computer
+git commit --amend -m "new message"      edit a commit message
+
+
