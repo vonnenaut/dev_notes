@@ -34,5 +34,97 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-o
 
 
 
+`docker container ls`
+
+shows running containers
+
+
+
+`docker container ls -a`
+
+shows all containers on system (running or not)	
+
+
+
+`docker container rm [first few letters of container ID]
+
+removes/deletes the specified container
+
+
+
+`docker images`
+
+lists all images on the local system
+
+
+
+docker image rm [first three chars of image ID]
+
+delete the local copy of the specified image
+
+
+
+`docker pull [image name]`
+
+download the specified image
+
+
+
+`docker container run -d -p 8080:80 --name mynginx nginx`
+
+start a container named mynginx with nginx running in it on local port 8080 with nginx's exposed port 80 and do this in the background, detached (-d)
+
+
+
+`docker ps` or `docker container ps`
+
+an older way to show containers (add -a to also show those not running)
+
+
+
+`docker container run -d -p 8081:80 --name myapache httpd`
+
+start a container in detached mode running Apache on localhost's port 8081 with Apache listening on its own port 80 (httpd is the name of the Docker container for Apache web server)
+
+
+
+```
+Go to Dockerhub and search for containers to get their official names.
+
+https://hub.docker.com/
+```
+
+
+
+`docker container run -d -p 3306:3306 --name mysql --env MYSQL_ROOT_PASSWORD=123456 mysql
+
+start a container running mysql database on localhost port 3306 using mysql's port 3306, setting the root password as 123456
+
+
+
+`docker container rm myapache -f`
+
+force-remove a running container
+
+
+
+
+
+## How to Edit Files in a Container:  Volumes and Bind Mounts
+
+`$ docker container exec -it mynginx bash`
+
+bash into container, accessing its filesystem interactively (-it)
+
+
+
+
+
+
+
+
+
+
+
 
 

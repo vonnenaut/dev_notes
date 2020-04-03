@@ -53,6 +53,63 @@ All of these functionalities are distinct from the business logic an application
 
 ## Putting an Application Server Between the Web Server and Ruby App
 
+The application server is itself another application and it'll execute your application just like an object calls another object's method in Ruby.  The app server:
+
+- contains code that allows it to parse HTTP information into Ruby data structures that make sense, for example, turning HTTP request headers into hashes.  
+
+- contains code that allows it to interface with a standard web server via socket connections which utilize the socket API of the OS.  
+
+- contains code that captures the return value of your application and transforms the return value into HTTP-formatted text.
+
+  
+
+The app server and web server communicate via a socket (either a TCP or Unix socket):
+
+- Unix sockets replace a host with a file path, which is faster since network overhead is removed;
+
+- this only works if the app server and web server are on the same machine
+
+  
+
+When the app server is ready to hand the parsed request to the Ruby app:
+
+- it will call your Ruby app with a method, passing in the parsed request as an argument or series of arguments
+- the Ruby app will execute and the application server will store the Ruby app's return value in a variable
+- it will re-format this variable into an HTTP response that the web server will understand, then sending that formatted HTTP response back to the web server via a socket connection
+- the web server then sends the HTTP response to the client
+
+
+
+## Division of Labor
+
+This architecture exemplifies the modular, separation-of-concerns based approach to development.  Thanks to application servers, our apps don't need to understand HTTP at all and don't need to return HTTP-compliant responses.  
+
+
+
+**Web Server**	parsing, authenticating, concurreny management
+
+**Application Server**	Parsing HTTP request into a data structure(e.g., headers --> hashes) to pass to a Ruby Application
+
+**Ruby Application**	Executes actual application logic
+
+
+
+**Client <--> Web Server <--> Application Server <--> Ruby Application**
+
+
+
+An interface has at least 2 sides.  An app server is an interface between a web server and a Ruby application.  On the web server side, it's written to handle the type of info. web servers send and to successfully return the type of info web servers understand (HTTP text).
+
+On the application side, it's written to call the application and to pass in certain arguments to the application.  Those arguments represent the HTTP request.  It's also written to capture the return value of calling that application, formatting that return-value into HTTP text and sending it back to the web server.
+
+What arugments does the application server pass to the Ruby application?  A developer needs to know, specifically, what method the server calls on the Ruby app, what arguments are passed to the Ruby app, the data type of the arguments, the order in which the arguments are passed in, how the application server locates the Ruby app so that it can call it, etc.  A developer needs to know all of this to ensure that the application code responds to the right method, accepts the right arguments and returns the right values.
+
+
+
+
+
+​	
+
 
 
 
