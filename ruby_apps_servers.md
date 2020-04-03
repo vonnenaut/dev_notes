@@ -38,6 +38,21 @@ Even better is to use an already-existing application that handles sockets and H
 
  Client requests first go through the pre-built web-facing application, taking incoming textual information and formatting it into HTTP text that's more user-friendly.  Our application sits behind the scenes, not having to worry about simultaneous requests, parsing HTTP requests, etc.  The pre-built application is called a web server (nginx, apache, etc.) and our app receives input from it instead of directly from the TCP socket.
 
+Problem with this approach:
+
+- the web server has no way to start our application directly
+- the web server speaks HTTP and the application doesn't
+
+One solution is to make web applications speak HTTP; The problem with this:
+
+- the app alone would have to do a lot more than just parse an HTTP request sent from a web server, execute code based on the info. in that request and then return a properly-formatted HTTP response.  
+- Communication would have to happen over a socket, meaning the application would have to implement socket communication.  
+- To handle more than one request concurrently, the application will need to start multiple instances of itself (as apache does)  The application will need to implement a way to monitor for crashes and to handle those crashes
+
+All of these functionalities are distinct from the business logic an application should contain and these features are general and necessary regardless of the application.  It makes sense to separate, therefore, to separate these responsibilities into something like an HTTP interface that translates HTTP requests, forwarded from the web server, into sensible arguments that are then passed to the application.  This interface can also translate the application's non-HTTP response into HTTP that is then passed back to the web server and, finally, to the client.  There exist many such interfaces, called application servers.
+
+## Putting an Application Server Between the Web Server and Ruby App
+
 
 
 
