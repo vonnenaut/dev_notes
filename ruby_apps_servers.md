@@ -155,6 +155,57 @@ https://stackoverflow.com/questions/3677715/distinguishing-between-nginx-and-thi
 
 # What is 'Rack' in Ruby/Rails?
 
+**Rack is a specification** to standardize how web servers and applications talk to one another.  
+
+**Web servers** send an env hash containing elements like 'REQEST_METHOD', 'PATH_INFO', 'HTTP_VERSION', etc.
+
+**Apps** return an array containing exactly 3 elements: HTTP status code, a hash of HTTP headers and a body object (which must respond to each).
+
+
+
+# Grow Your Own Web Framework With Rack Part 1
+
+Covering:
+
+- what rack is
+- how to use it to handle incoming requests
+- how to use templating techniques to return a response
+- how to extract common code to plant the seeds for your very own web application development framework
+- build a simple Rack application
+
+## What is Rack?
+
+a web server interface that provides a fluid API for creating web applications.  Rack-based popular frameworks include Sinatra and Ruby on Rails.  They're rack-based because they adhere to the Rack interface to easily communicate between the server and the client.   In some ways you can think of Rack as a protocol or specification (though it's slightly more than that.)
+
+Rack gives developers a consistent interface when working with Rack-compatible servers, a way to abstract away the mundane work of connecting and communicating with the web-serving and content-generating tiers of Ruby web applications.
+
+
+
+Steps
+
+1. Create a Gemfile.
+
+   ```
+   # Gemfile
+   
+   source "https://rubygems.org"
+   
+   gem 'rack', '~> 2.0.1'
+   
+   ```
+
+   
+
+2. Run `bundle install` to install dependencies from Gemfile.
+
+
+
+## What Makes a Rack Application?
+
+Rack is a specification for connecting our application code to a web server and also our application to a client.
+
+
+
 
 
 
