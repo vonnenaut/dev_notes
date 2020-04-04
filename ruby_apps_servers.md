@@ -1,5 +1,14 @@
 # Ruby Applications, Application Servers and Web Servers
 
+[Demystifying Ruby Applications, Ruby Application Servers, and Web Servers](https://medium.com/launch-school/demystifying-ruby-applications-ruby-application-servers-and-web-servers-c3d0fd415cb3)
+
+http://blog.gauravchande.com/what-is-rack-in-ruby-rails
+
+-   [Part 1](https://launchschool.com/blog/growing-your-own-web-framework-with-rack-part-1)
+-   [Part 2](https://launchschool.com/blog/growing-your-own-web-framework-with-rack-part-2)
+-   [Part 3](https://launchschool.com/blog/growing-your-own-web-framework-with-rack-part-3)
+-   [Part 4](https://launchschool.com/blog/growing-your-own-web-framework-with-rack-part-4)
+
 
 
 **TCPSocket**	class provided by Ruby's standard library which allows easier utilization of socket API
@@ -102,7 +111,51 @@ An interface has at least 2 sides.  An app server is an interface between a web 
 
 On the application side, it's written to call the application and to pass in certain arguments to the application.  Those arguments represent the HTTP request.  It's also written to capture the return value of calling that application, formatting that return-value into HTTP text and sending it back to the web server.
 
-What arugments does the application server pass to the Ruby application?  A developer needs to know, specifically, what method the server calls on the Ruby app, what arguments are passed to the Ruby app, the data type of the arguments, the order in which the arguments are passed in, how the application server locates the Ruby app so that it can call it, etc.  A developer needs to know all of this to ensure that the application code responds to the right method, accepts the right arguments and returns the right values.
+What arguments does the application server pass to the Ruby application?  **A developer needs to know, specifically, what method the server calls on the Ruby app, what arguments are passed to the Ruby app, the data type of the arguments, the order in which the arguments are passed in, how the application server locates the Ruby app so that it can call it, etc.**  A developer needs to know all of this to ensure that the application code responds to the right method, accepts the right arguments and returns the right values.
+
+A problem can arise because there are many frameworks and application servers -- if all the servers use a different interface to call the Ruby app and all the frameworks construct Ruby apps that expect to be called with different methods and arguments, managing **compatibility issues** can become a big problem.
+
+This scenario is perfect for introducing a protocol or set of conventions which would specify which method all application servers should use to call an application and which method all applications should respond to.  It would specify which values the application would return, once called, and therefore it would specify which values the application server could expect to be returned from the Ruby app, making it much easier to construct a valid HTTP response out of the values returned by the Ruby app.  It would also specify the argument(s) that should be passed into the app when called.  In short, it would specify a common language or interface that Ruby apps and application servers could use to communicate.
+
+**Introducing Rack**
+
+Such a protocol exists already -- Rack.
+
+<img class="nq pm s t u jo ai jw" srcset="https://miro.medium.com/max/552/1*ZLDeP7B0Uu5BAluwXz3NRQ.png 276w, https://miro.medium.com/max/1046/1*ZLDeP7B0Uu5BAluwXz3NRQ.png 523w" sizes="523px" role="presentation" src="https://miro.medium.com/max/523/1*ZLDeP7B0Uu5BAluwXz3NRQ.png" width="523" height="383">
+
+<img class="nq pm s t u jo ai jw" srcset="https://miro.medium.com/max/552/1*k7cbm7xNb31rNwTDnsWvgQ.png 276w, https://miro.medium.com/max/1046/1*k7cbm7xNb31rNwTDnsWvgQ.png 523w" sizes="523px" role="presentation" src="https://miro.medium.com/max/523/1*k7cbm7xNb31rNwTDnsWvgQ.png" width="523" height="383">
+
+Application servers and Ruby web servers are synonymous.
+
+
+
+**Further reading**
+
+[Web Application Architecture — Principles, Protocols, and Practices 2nd Ed.](https://www.amazon.com/Web-Application-Architecture-Principles-Protocols/dp/047051860X/ref=sr_1_1?ie=UTF8&qid=1505141443&sr=8-1&keywords=web+application+architecture)
+
+[What is Rack?](http://blog.gauravchande.com/what-is-rack-in-ruby-rails)
+
+[Understanding Rack Middleware](https://codenoble.com/blog/understanding-rack-middleware/)
+
+[Phusion Passenger Design and Architecture](https://www.phusionpassenger.com/documentation/Design and Architecture.html)
+
+[Distinguishing Between Nginx and Thin](https://stackoverflow.com/questions/3677715/distinguishing-between-nginx-and-thin)
+
+[Web servers and App servers](https://stackoverflow.com/questions/4113299/ruby-on-rails-server-options/4113570#4113570)
+
+[What is Thin and Why do I need it?](https://serverfault.com/questions/605853/what-is-thin-and-why-do-i-need-it)
+
+
+
+**Thin vs Nginx Difference:**
+
+https://stackoverflow.com/questions/3677715/distinguishing-between-nginx-and-thin
+
+
+
+# What is 'Rack' in Ruby/Rails?
+
+
 
 
 
