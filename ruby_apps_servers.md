@@ -181,7 +181,7 @@ Rack gives developers a consistent interface when working with Rack-compatible s
 
 
 
-Steps
+**Steps for Creating a Rackable Ruby Application**
 
 1. Create a Gemfile.
 
@@ -198,13 +198,43 @@ Steps
 
 2. Run `bundle install` to install dependencies from Gemfile.
 
+3. Create a rackup configuration file in our project's root directory.
+
+   ```
+   # config.ru
+   require_relative 'hello_world'
+   
+   run HelloWorld.new
+   ```
+
+4. Write your Ruby program, including the required call(env) method and returning a 3-element array containing the 3 required elements (status code (string), headers (hash) and response-body (responds to `each`).
+
+5. Run the program with
+
+   ```
+   bundle exec rackup config.ru -p 9595
+   ```
+
+   
+
 
 
 ## What Makes a Rack Application?
 
-Rack is a specification for connecting our application code to a web server and also our application to a client.
+Rack is a specification for connecting our application code to a web server and also our application to a client.  To this end, Rack has some very specific conventions in place.  Here's what you need to make your Ruby code into a Rack application:
+
+1. Create a "rackup" file:  a configuration file specifying what to run and how.  '.ru' extension. 
+2. The rack application used in the rackup file must be a Ruby object that responds to the method `call(env)`, which takes the environment variable for this application.
+
+The call method always returns an array containing these 3 elements:
+
+1. **Status code**, represented by a string or some other data type that responds to `to_i`,
+2. **Headers** in the form of of key-value pairs inside a hash.  The key will be a header name and its value the value for that header.
+3. **Response Body** is any object which can respond to an `each` method call.  An `Enumerable` or `StringIO` object would work, for example, or even a custom object with an `each` method.  The response can never be just a `String` by itself but it must `yield` a `String` value.
 
 
+
+# Grow Your Own Web Framework With Rack Part 2
 
 
 
