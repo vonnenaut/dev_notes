@@ -236,13 +236,158 @@ The call method always returns an array containing these 3 elements:
 
 # Grow Your Own Web Framework With Rack Part 2
 
+## Application Environment - env
+
+env contains:
+
+```
+    GATEWAY_INTERFACE : CGI/1.1
+    PATH_INFO : /
+    QUERY_STRING :
+    REMOTE_ADDR : 127.0.0.1
+    REMOTE_HOST : 127.0.0.1
+    REQUEST_METHOD : GET
+    REQUEST_URI : http://localhost:9595/
+    SCRIPT_NAME :
+    SERVER_NAME : localhost
+    SERVER_PORT : 9595
+    SERVER_PROTOCOL : HTTP/1.1
+    SERVER_SOFTWARE : WEBrick/1.3.1 (Ruby/2.3.1/2016-04-26)
+    HTTP_HOST : localhost:9595
+    HTTP_CONNECTION : keep-alive
+    HTTP_CACHE_CONTROL : max-age=0
+    HTTP_UPGRADE_INSECURE_REQUESTS : 1
+    HTTP_USER_AGENT : Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like – Gecko) Chrome/53.0.2785.143 Safari/537.36
+    HTTP_ACCEPT : text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,/;q=0.8
+    HTTP_ACCEPT_ENCODING : gzip, deflate, sdch
+    HTTP_ACCEPT_LANGUAGE : en-US,en;q=0.8
+    HTTP_COOKIE : _netflux_session=VTZoU1ZvVXlZV1MrQ3pTMHhlNXBSRGdpMFdXQXhrRFJnUGNMMEhhQmNLanp1aU9rb3pyQ3o2dGRE eVp0ZW5YTVJaSXBqZldIdWV1ZEtDRFdJWVo5b0FkMHRyZWVLVXVjR0lRdnV5dnl4VU01UWs0ZnBTbmlQc1Urb1g2ME1yU0pESkg0bGR2 bmwzR0h2bUt6a2xlQjlNNEpJNGtiOG1BQ2VkS0p5TWEvc1U0THdkNGtzbEtETmUrb1lDVHY5VWtKLS1oMnQ1cUlXcVJWcXZqTHpqWUNO L0JRPT0%3D—17bf5208879c831997c5c78c69895ded29aad26b
+    rack.version : [1, 3]
+    rack.input : #
+    rack.errors : #
+    rack.multithread : true
+    rack.multiprocess : false
+    rack.run_once : false
+    rack.url_scheme : http
+    rack.hijack? : true
+    rack.hijack : #
+    rack.hijack_io :
+    HTTP_VERSION : HTTP/1.1
+    REQUEST_PATH : /
+
+```
+
+This information crucially tells our server side code how to process the request.  For example, `REQUEST_PATH` may tell which resource this request is retrieving and what query parameters are being attached with the request.
+
+## Routing:  Adding in other pages to our application
+
+```ruby
+# advice.rb
+
+class Advice
+  def initialize
+    @advice_list = [
+      "Look deep into nature, and then you will understand everything better.",
+      "I have found the paradox, that if you love until it hurts, there can be no more hurt, only more love.",
+      "What we think, we become.",
+      "Love all, trust a few, do wrong to none.",
+      "Oh, my friend, it's not what they take away from you that counts. It's what you do with what you have left.",
+      "Lost time is never found again.",
+      "Nothing will work unless you do."
+    ]
+  end
+
+  def generate
+    @advice_list.sample
+  end
+end
+```
+
+
+
+```ruby
+# hello_world.rb
+require_relative 'advice'     # loads advice.rb
+
+class HelloWorld
+  def call(env)
+    case env['REQUEST_PATH']
+    when '/'
+      ['200', {"Content-Type" => 'text/plain'}, ["Hello World!"]]
+    when '/advice'
+      piece_of_advice = Advice.new.generate    # random piece of advice
+      ['200', {"Content-Type" => 'text/plain'}, [piece_of_advice]]
+    else
+      [
+        '404',
+        {"Content-Type" => 'text/plain', "Content-Length" => '13'},
+        ["404 Not Found"]
+      ]
+    end
+  end
+end
+```
+
+```ruby
+# config.ru
+require_relative 'hello_world'
+
+run HelloWorld.new
+```
+
+```
+bundle exec rackup config.ru -p 9595
+```
+
+```
+# config runs hello_world.rb, which imports and uses advice.rb
+```
+
+
+
+## Adding HTML to the Response Body
+
+Better HTML formatting:
+
+```ruby
+require_relative 'advice'
+
+class HelloWorld
+  def call(env)
+    case env['REQUEST_PATH']
+    when '/'
+      [
+        '200',
+        {"Content-Type" => 'text/html'},
+        ["<html><body><h2>Hello World!</h2></body></html>"]
+      ]
+    when '/advice'
+      piece_of_advice = Advice.new.generate
+      [
+        '200',
+        {"Content-Type" => 'text/html'},
+        ["<html><body><b><em>#{piece_of_advice}</em></b></body></html>"]
+      ]
+    else
+      [
+        '404',
+        {"Content-Type" => 'text/html', "Content-Length" => '48'},
+        ["<html><body><h4>404 Not Found</h4></body></html>"]
+      ]
+    end
+  end
+end
+```
 
 
 
 
 
 
-​	
+
+
+
+
 
 
 
