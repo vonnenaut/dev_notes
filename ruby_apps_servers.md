@@ -383,11 +383,99 @@ end
 
 
 
+# Grow Your Own Web Framework With Rack Part 3
+
+**View Templates**	separate files that allow us to do some preprocessing on the server side in a programming language and then translate programming code into a string to return to the client (usually HTML).
+
+**ERB**	Embedded Ruby, a popular Ruby templating library
 
 
 
+## ERB
+
+ERB allows us to embed Ruby directly into HTML.  The ERB library can process a special syntax that mixes Ruby into HTML and produces a final 100% HTML string.
+
+It works in conjunction, here, with separate view template files ending in `.erb`.
 
 
+
+**To use ERB:**
+
+- require 'erb'
+- Create an ERB template object and pass in a string using the special syntax that mixes Ruby with HTML
+- Invoke the ERB instance method `result`, which will give us a 100% HTML string.
+
+
+
+**ERB Syntax -- Two Variants**
+
+- <%= %>` – will evaluate the embedded Ruby code,  and include its return value in the HTML output. A method invocation,  for example, would be a good candidate for this tag.
+- `<% %>` – will only evaluate the Ruby code, but not include the return value in the HTML output. You’d use this tag for  evaluating Ruby but don’t want to include its return value in the final  string. A method definition, for example, would be a good use case for  this tag.
+
+
+
+ERB can also be used to process entire files, not just strings.
+
+```erb
+# example.erb
+<% names = ['bob', 'joe', 'kim', 'jill'] %>
+
+<html>
+  <body>
+    <h4>Hello, my name is <%= names.sample %></h4>
+  </body>
+</html>
+```
+
+```ruby
+# example.rb
+require 'erb'
+
+template_file = File.read('example.erb')
+erb = ERB.new(template_file)
+erb.result
+```
+
+
+
+## Adding in View Templates
+
+```ruby
+# views/index.erb
+<html>
+  <body>
+    <h2>Hello World!</h2>
+  </body>
+</html>
+```
+
+```ruby
+# hello_world.rb
+
+class HelloWorld
+  def call(env)
+    case env['REQUEST_PATH']
+    when '/'
+      template = File.read("views/index.erb")
+      content = ERB.new(template)
+      ['200', {"Content-Type" => "text/html"}, [content.result]]
+    when '/advice'
+      piece_of_advice = Advice.new.generate
+      [
+        '200',
+        {"Content-Type" => 'text/html'},
+        ["<html><body><b><em>#{piece_of_advice}</em></b></body></html>"]
+      ]
+    else
+      [
+        '404',
+        {"Content-Type" => 'text/html', "Content-Length" => '48'},
+        ["<html><body><h4>404 Not Found</h4></body></html>"]
+      ]
+    end
+  end
+end
+```
 
 
 
