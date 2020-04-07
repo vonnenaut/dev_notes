@@ -37,7 +37,27 @@ You don't need to know too much about the IO and File classes for the purposes o
 
 ## Rendering Templates
 
+Let's transition from the app acting as a static file server into a more dynamic app which renders a template instead.
 
+Templates or view templates are files that contain text that is converted into HTML before being sent to a user's browser in a response.  There are many templating languages with different ways to define what HTML to generate and how to embed dynamic values.
+
+For example, you might want the <title> to be different on each page and so this would be a dynamic value defined in Ruby code and inserted into the template before it was sent to a user.
+
+We'll use a templating language called `ERB` which stands for *embedded Ruby* and the fact that bits of Ruby code are embedded into another file.  `ERB` is also the default templating language in Ruby on Rails so knowledge gained here will carry over to projects that use that framework as well.
+
+Here's an example of printing a dynamic value:
+
+```erb
+<h1><%= @title %></h1>
+```
+
+When the template is *rendered*, the value for `@title` will replace the ERB tags. If `@title == "Book Viewer"`, the rendered output of the template would be:
+
+```html
+<h1>Book Viewer</h1>
+```
+
+If you are having trouble with something not appearing in a template, always check to **make sure you have included the `=`**. This is a common mistake, since there is no error.
 
 
 
