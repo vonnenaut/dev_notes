@@ -481,9 +481,85 @@ end
 
 
 
+# Grow Your Own Web Framework With Rack Part 4
+
+Originally, our `call` method focused purely on interacting  with the request and then handling the response.  Now, we have code  related to reading in files and setting up a templating object, an  object not directly related to the request or response. A good way to  clean this up would be to move this code to its own method. Then, we can use this method from within our `call` method. Let’s give this a try.
+
+First, we’ll invoke a non-existent method to mimic the interface we wish we had, and then we’ll go and implement that method.
+
+Here is an updated `call` method, using a non-existent `erb` method that abstracts away the details of how ERB templates are prepared and rendered. We pass that `erb` method a symbol, signifying which template to render. Line 6 shows this idea in code.
+
+```ruby
+# hello_world.rb
+
+def call(env)
+  case env['REQUEST_PATH']
+  when '/'
+    ['200', {"Content-Type" => "text/html"}, [erb(:index)]]
+  when '/advice'
+    piece_of_advice = Advice.new.generate
+    [
+      '200',
+      {"Content-Type" => 'text/html'},
+      ["<html><body><b><em>#{piece_of_advice}</em></b></body></html>"]
+    ]
+  else
+    [
+      '404',
+      {"Content-Type" => 'text/html', "Content-Length" => '48'},
+      ["<html><body><h4>404 Not Found</h4></body></html>"]
+    ]
+  end
+end
+```
 
 
 
+We then use the return value from the `erb` method as our response body. Now, here is the `erb` method implementation:
+
+````ruby
+def erb(filename)
+  content = File.read("views/#{filename}.erb")
+  ERB.new(content).result
+end
+````
+
+
+
+And with our new method, the entire `HelloWorld` application looks like:
+
+```ruby
+# hello_world.rb
+
+class HelloWorld
+  def call(env)
+    case env['REQUEST_PATH']
+    when '/'
+      ['200', {"Content-Type" => "text/html"}, [erb(:index)]]
+    when '/advice'
+      piece_of_advice = Advice.new.generate
+      [
+        '200',
+        {"Content-Type" => 'text/html'},
+        ["<html><body><b><em>#{piece_of_advice}</em></b></body></html>"]
+      ]
+    else
+      [
+        '404',
+        {"Content-Type" => 'text/html', "Content-Length" => '48'},
+        ["<html><body><h4>404 Not Found</h4></body></html>"]
+      ]
+    end
+  end
+
+  private
+
+  def erb(filename)
+    content = File.read("views/#{filename}.erb")
+    ERB.new(content).result
+  end
+end
+```
 
 
 
