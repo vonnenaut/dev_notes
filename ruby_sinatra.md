@@ -1,4 +1,30 @@
-# Sinatra -- A Ruby web framework![img](https://da77jsbdz4r05.cloudfront.net/images/working_with_sinatra/server-zoom-sinatra.png)
+# Sinatra -- A Ruby web framework
+
+**Routes**	paths to resources based on request input
+
+**Views**	a folder containing embedded Ruby files (`.erb`) which are rendered into HTML pages and served to the client
+
+**layout.erb**	the default overarching layout template which stays the same across content and which contains a `<%= yield %>` `erb` tag to reference more-specific templates for individual pages; `layout.erb` is effectively a wrap-around template with general content which references, via yield, other, smaller templates for specialized content, making code more DRY.
+
+a layout can be specified on a route like this:
+
+```erb
+get '/' do
+  erb :index, layout: :post
+end
+```
+
+Otherwise, if no layout is specified, Sinatra will look for the default layout, `layout.erb`.  This way, when you have content to a specific page, you just need to insert it via yield from its own `.erb` file in the `views/` folder, specifying it in the routes file.  Rather that repeating the elements that are the same, they are grouped into one `layout.erb` file.
+
+
+
+
+
+
+
+
+
+# ![img](https://da77jsbdz4r05.cloudfront.net/images/working_with_sinatra/server-zoom-sinatra.png)
 
 
 
