@@ -16,11 +16,55 @@ end
 
 Otherwise, if no layout is specified, Sinatra will look for the default layout, `layout.erb`.  This way, when you have content to a specific page, you just need to insert it via yield from its own `.erb` file in the `views/` folder, specifying it in the routes file.  Rather that repeating the elements that are the same, they are grouped into one `layout.erb` file.
 
+**Route parameters**	variables used in routes which reduce code duplication; parameters are passed through the URL to the application and appear in the `params` has; for example, of the URL passes `/?number=2`, it is accessed in the routes via `params[:number]`
 
+**Before filters**	a section of the routes file which allows loading variables one time which are used and would otherwise have to be loaded multiple times by multiple path requests;
 
+```ruby
+before do
+  @contents = File.readlines("data/toc.txt")
+end
 
+get "/" do
+  @title = "The Adventures of Sherlock Holmes"
 
+  erb :home
+end
 
+get "/chapters/:number" do
+  number = params[:number].to_i
+  chapter_name = @contents[number - 1]
+  @title = "Chapter #{number}: #{chapter_name}"
+
+  @chapter = File.read("data/chp#{number}.txt")
+
+  erb :chapter
+end
+```
+
+**View helpers**	methods that are made available in templates by Sinatra for the purpose of filtering data, processing data or performing some other functionality
+
+Helpers are defined within a `helpers` block in a Sinatra application:
+
+```ruby
+helpers do
+  def slugify(text)
+    text.downcase.gsub(/\s+/, "-").gsub(/[^\w-]/, "")
+  end
+end
+```
+
+This can be used like any other method in a template (assuming `@title == "Todayis the Day"`):
+
+```html
+<a href="/articles/<%= slugify(@title) %>"><%= @title %></a>
+```
+
+And will render the expected output:
+
+```html
+<a href="/articles/today-is-the-day">Today is the Day</a>
+```
 
 
 
